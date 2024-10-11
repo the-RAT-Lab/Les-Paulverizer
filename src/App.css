@@ -1,0 +1,99 @@
+#root {
+  margin: 0 auto;
+  text-align: center; 
+  background-color: #242424;
+  background-size: 100% 100%;
+  min-height: 100vh;
+  min-width: 100vw;  
+}
+
+.row{
+  padding: 1rem;
+}
+
+.row:after{
+  content: "";
+  display: table;
+  clear: both;
+  margin: 1rem
+}
+
+.column {
+  float: left;
+  width: 50%;
+}
+
+h2{
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  font-size: xx-large;
+}
+
+h2.metronome{
+  font-size: 27px;
+}
+
+h2.inputfield{
+  font-size: 15px;
+  font-size: large;
+  font-weight: bold;
+}
+
+button{
+  color: white;
+  margin: 0.5rem;
+}
+
+button.button0{
+  font-size: 15px;
+  background-color: #705cd3;
+}
+
+button.button1{
+  font-size: 15px;
+  background-color: #b561f3;
+}
+button.button2{
+  font-size: 15px;
+  background-color: #d8b1fc;
+}
+
+button.button3{
+  font-size: 15px;
+  background-color: #f7c5de;
+}
+
+.select-music{
+  font-size: 15px;
+  border-color: lightgray;
+  background-color: rgb(60, 60, 60);
+  color:white;
+}
+
+
+input.textinput{
+  text-align: center;
+  border-radius: 6px;
+  border-color: white;
+  border-width: 2px;
+
+  background-color: #242424;
+  color: white;
+}
+
+input.upload{
+  color-scheme: gray;
+  padding-left: 1em;
+  color: lightgray;
+}
+
+img.lespaul{
+  height: 2em;
+  padding-top: 1em;
+  margin-bottom: -1em;
+}
+
+img.logo{
+  padding-top: 2rem;
+  height: 3.5em;
+ }
