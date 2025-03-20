@@ -1,4 +1,6 @@
-# Les Paulverizer Website: by Casey Costa, Lexi Krzywicki, and Tristin Youtz
+# Les Paulverizer Website (lespaulverizer.net
+
+Demo: https://www.youtube.com/watch?v=ic7TwA5fXPE 
 
 The Les Paulverizer is a small MIDI device that allows a user to play looping background tracks while the user can continue to play a melody on their instrument. In previous iterations of this project, this functionality was provided through a Max 8 patch, which worked but was not accessible to those who did not own the software. During A term 2024, we were tasked with emulating the functions of the Max patch within a web platform. We used ReactJS to build the website and GitHub for source control.
 
