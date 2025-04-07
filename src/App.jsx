@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import './App.css'
-import Stack from 'react-bootstrap/Stack';
 
 // IMPORT BOTH THE LabRAT LOGO AND THE LES PAULVERIZER LOGO
 import LabRAT from './assets/images/Lab_RAT_Logo.png'
@@ -41,11 +40,13 @@ var audioFiles = [new Audio(group1[0]), new Audio(group1[1]), new Audio(group1[2
 var audioState = [false, false, false, false];
 
 function App() {
-
   // STATE VARIABLES FOR THE TIME (WHAT THE METRONOME SAYS), THE METRONOME STATUS, AND WHAT MIDI NOTE IS BEING PLAYED
   const [time, setTime] = useState(defaultTimerVal);
   const [metroOn, setMetroOn] = useState(false);
   const [currentNote, setCurrentNote] = useState('Connect to MIDI');
+  const [currentBT, setCurrentBT] = useState('Connect to Bluetooth');
+  const MIDI_SERVICE_UUID = '03b80e5a-ede8-4b33-a751-6ce34ec4c700';
+  const MIDI_IO_CHARACTERISTIC_UUID = '7772e5db-3868-4112-a1a9-f2669d106bf3';
 
   // STATE VARIABLES FOR THE TEMPO, THE TIME SIGNATURE, AND THE NUMBER OF MEASURES
   // NOTE: CURRENTLY, THE USER CANNOT ACCESS timeSignature[1]. THE ONLY THING USERS CAN CHANGE IS timeSignature[0]
@@ -97,19 +98,21 @@ function App() {
   // SOUND HANDLER --> LISTENS FOR ANY CHANGE TO THE time VARIBALE (THE METRONOME) 
   //                        IF THE TIME IS 1, THEN IT WILL RESTART ALL AUDIO FILES CURRENTLY ACTIVE (LOOPING!)
   React.useEffect(() => {
-    if (time == 1) {
+    //if (time == 1) {
       for (var i = 0; i < audioState.length; i++){
         if (audioState[i]){
-          audioFiles[i].pause();
-          audioFiles[i].currentTime = 0;
+          //audioFiles[i].pause();
+          //audioFiles[i].currentTime = 0;
           audioFiles[i].play();
+          audioFiles[i].loop = true;
         }
       }
-    }
+    //}
   }, [time]);
   
 
   // TRY TO HAIL MIDI DEVICES -> CALLED WHEN connect midi BUTTON PRESSED
+  // Used for usb and non-webbluetooth connections
   function midiStartup() {
     setCurrentNote('Hailing...');
     navigator.requestMIDIAccess().then(onMidiSuccess,onMidiFailure);
@@ -119,38 +122,111 @@ function App() {
   // NO MIDI DEVICES FOUND HANDLER
   function onMidiFailure() {
     setCurrentNote('Connection Failed');
+    document.getElementsByName("MIDIbutton")[0].disabled = false;
   }
 
 
   // MIDI DEVICE FOUND HANDLER / ASSIGNS getMidiMessage AS MIDI INPUT HANDLER
   function onMidiSuccess(midiAccess) {
     setCurrentNote('Connected');
+    document.getElementsByName("MIDIbutton")[0].disabled = true;
     midiAccess.inputs.forEach((input) => {
       input.onmidimessage = getMidiMessage;
     })
   }
 
+  // web bluetooth setup handler, will pop up a device selector with only les paulverizers visible
+  function webBTsetup() {
+    const bt = navigator.bluetooth;
+    if (bt === null || bt === undefined) {
+      console.log("WebBluetooth not enabled or unsupported");
+      document.getElementsByName("BTbutton")[0].innerHTML = '<a target="_blank" href="./BTinstructions.html">Bluetooth instructions</a>';
+      return;
+    }
+    document.getElementsByName("BTbutton")[0].disabled = false;
+    setCurrentBT("Listing devices");
+    bt.getAvailability().then((available) => {
+      if (available) {
+        console.log("This device supports Bluetooth!");
+        let options = {
+          filters: [
+            {services: [MIDI_SERVICE_UUID]}, //ensures that only our device shows up in the chooser
+            {name: "Les Paulverizer"},
+          ],
+          optionalServices: [MIDI_SERVICE_UUID],
+          //acceptAllDevices: true, //would pop up a generic device chooser
+        }
+        bt.requestDevice(options).then(connectBTDevice);
+      } else {
+        console.log("WebBluetooth not enabled or unsupported");
+        document.getElementsByName("BTbutton")[0].innerHTML = '<a target="_blank" href="./BTinstructions.html">Bluetooth instructions</a>';
+      }
+    });
+  }
+
+  //Known issue: if user is pressing one of the buttons during the pairing process, the web button will be stuck in the opposite state (i.e. on unless physical button pressed)
+  // alleviated by just clicking the on-screen button to toggle it off
+  async function connectBTDevice(device) {
+    console.log(device);
+    const server = await device.gatt.connect();
+    console.log("connected to server: "+server.connected);
+    setCurrentBT("Connecting");
+    const service = await server.getPrimaryService(MIDI_SERVICE_UUID);
+    console.log("got service");
+    const characteristic = await service.getCharacteristic(MIDI_IO_CHARACTERISTIC_UUID);
+    characteristic.addEventListener('characteristicvaluechanged', (e)=>{
+      const packet = new Uint8Array(e.target.value.buffer)
+      // console.log("BT char updated: "+packet);
+      getMidiMessage({data: [packet[2], packet[3], packet[4]]});
+    });
+    await characteristic.startNotifications();
+    setCurrentBT("Connected");
+    setCurrentNote("Connected");
+    document.getElementsByName("BTbutton")[0].disabled = true; //to prevent people from messing things up after it's already working
+    document.getElementsByName("MIDIbutton")[0].disabled = true; // logic being that if they want to change config, they should refresh
+  }
+
+  //sets the actual tempo on screen and changes the playback speed of all four elements, whether they're playing or not
+  // since the defualt is 100bpm, I set that to be 1.0 speed. The potentiometer on the device goes up to 227
+  function setPlayTempo(tempo) {
+    setTempo(tempo);
+    document.getElementsByName("TempoSet")[0].value = tempo;
+    for (let i = 0; i < audioFiles.length; i++) {
+      //convert from 100-227 to 1.0 to 2.27
+      let convTempo = (tempo/100).toFixed(2);
+      audioFiles[i].defaultPlaybackRate = convTempo;
+      audioFiles[i].playbackRate = convTempo;
+    }
+  }
 
   // MIDI INPUT HANDLER -> CALLS handleClick() FOR EACH POSSIBLE BUTTON (NOTE 39,41,43,45)
   function getMidiMessage(message) {
+    // console.log(message);
     var command = message.data[0];
     var note = message.data[1];
     var velocity = message.data[2];
-    if (velocity > 10) {
-        //setCurrentNote(note);
-        switch (note) {
-          case 63:
-            handleClick(0);
-            break;
-          case 65:
-            handleClick(1);
-            break;
-          case 67:
-            handleClick(2);
-            break;
-          case 69:
-            handleClick(3);
-            break;
+    if (command === 182) {
+      //set tempo to value of velocity
+      let inTempo = velocity+100; //increase so it's more interesting
+      setPlayTempo(inTempo);
+      // console.log("inTempo: "+inTempo+", tempo: "+tempo);
+    } else if (command === 128 || command === 144) { // so it doesn't accidentally change a note value
+      if (velocity > 10) {
+          //setCurrentNote(note);
+          switch (note) {
+            case 63:
+              handleClick(0);
+              break;
+            case 65:
+              handleClick(1);
+              break;
+            case 67:
+              handleClick(2);
+              break;
+            case 69:
+              handleClick(3);
+              break;
+        }
       }
     }
     else {
@@ -234,7 +310,7 @@ function App() {
 
       case 0:
         // LOOP THROUGH OUR CURRENT AUDIO FILES
-        for (var i = 0; i < audioFiles.length; i++) {
+        for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF THE USER'S UPLOADED FILES (OR group1's FILES IF NONE ARE UPLOADED)
           audioFiles[i] = new Audio(customGroup[i]);
         }
@@ -242,7 +318,7 @@ function App() {
 
       case 1:
         // LOOP THROUGH OUR CURRENT AUDIO FILES
-        for (var i = 0; i < audioFiles.length; i++) {
+        for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group1's FILES
           audioFiles[i] = new Audio(group1[i]);
         }
@@ -251,7 +327,7 @@ function App() {
 
       case 2:
         // LOOP THROUGH OUR CURRENT AUDIO FILES
-        for (var i = 0; i < audioFiles.length; i++) {
+        for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group2's FILES
           audioFiles[i] = new Audio(group2[i]);
         }
@@ -259,7 +335,7 @@ function App() {
 
       case 3:
         // LOOP THROUGH OUR CURRENT AUDIO FILES
-        for (var i = 0; i < audioFiles.length; i++) {
+        for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group3's FILES
           audioFiles[i] = new Audio(group3[i]);
         }
@@ -473,8 +549,11 @@ function App() {
       {/* THIS SECTION CONTAINS THE BUTTON THAT ALLOWS THE USER TO CONNECT MIDI DEVICES */}
       <div>
         {/* WHEN CLICKED, THIS BUTTON WILL CALL THE midiStartup() FUNCTION. IT DISPLAYS THE VALUE OF currentNote */}
-        <button onClick={() => midiStartup()} className="select-music">
+        <button onClick={() => midiStartup()} name="MIDIbutton" className="select-music">
           {currentNote}
+        </button>
+        <button onClick={() => webBTsetup()} name="BTbutton" className="select-music">
+          {currentBT}
         </button>
       </div>
       {/* MIDI CONNECT BUTTON END ===================================================== */}
