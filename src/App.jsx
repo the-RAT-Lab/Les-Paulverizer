@@ -145,6 +145,7 @@ function App() {
     }
     document.getElementsByName("BTbutton")[0].disabled = false;
     setCurrentBT("Listing devices");
+	//TODO: add failure conditions to both of these .then()s
     bt.getAvailability().then((available) => {
       if (available) {
         console.log("This device supports Bluetooth!");
@@ -167,6 +168,7 @@ function App() {
   //Known issue: if user is pressing one of the buttons during the pairing process, the web button will be stuck in the opposite state (i.e. on unless physical button pressed)
   // alleviated by just clicking the on-screen button to toggle it off
   async function connectBTDevice(device) {
+	  //TODO: add error handling
     console.log(device);
     const server = await device.gatt.connect();
     console.log("connected to server: "+server.connected);
