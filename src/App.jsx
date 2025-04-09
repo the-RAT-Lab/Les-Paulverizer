@@ -451,11 +451,11 @@ function App() {
 
 
       {/* THIS SECTION CONTAINS THE CUSTOM MUSIC BUTTON (ALLOWS USER TO SWITCH TO THE CUSTOM TRACKS THEY UPLOADED) */}
-      <div className="button">
+      {/* <div className="button">
         <button onClick={() => setDefaultMusic(0)} className="select-music">
           Custom Music
         </button>
-      </div>
+      </div> */}
       {/* END CUSTOM MUSIC BUTTON SECTION ======================================================================== */}
 
 
@@ -486,6 +486,9 @@ function App() {
         {/* WHEN CLICKED, THIS BUTTON WILL CALL THE midiStartup() FUNCTION. IT DISPLAYS THE VALUE OF currentNote */}
         <button onClick={() => midiStartup()} className="select-music">
           {currentNote}
+        </button>
+        <button onClick={() => setDefaultMusic(0)} className="select-music">
+          Custom Music
         </button>
       </div>
       {/* MIDI CONNECT BUTTON END ===================================================== */}
