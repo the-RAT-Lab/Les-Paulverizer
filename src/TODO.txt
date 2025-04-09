@@ -1,0 +1,13 @@
+TODO:
+firmware:
+    change firmware to have buttons *toggle* the samples on the webapp over BT like on USB
+    implement firmware switch to toggle mode for both USB and BT based on one button being held on startup (when plugged in)
+
+webapp:
+    finalize BT instructions for Mac
+    get updated UI from other team
+    get samples that actually loop properly to determine if new looping code works
+    make sure that it actually works with all methods of connection
+    make sure that audio plays properly on all platforms and via all methods
+    investigate if data can be sent back to the device
+    

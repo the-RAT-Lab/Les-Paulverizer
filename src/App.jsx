@@ -92,13 +92,13 @@ function App() {
       clearInterval(interval);
     };
 
-  }, [metroOn]);
+  }, [metroOn, tempo]);
 
 
   // SOUND HANDLER --> LISTENS FOR ANY CHANGE TO THE time VARIBALE (THE METRONOME) 
   //                        IF THE TIME IS 1, THEN IT WILL RESTART ALL AUDIO FILES CURRENTLY ACTIVE (LOOPING!)
   React.useEffect(() => {
-    //if (time == 1) {
+    //if (time == 1) { //It seems disabling this makes looping sound better. Not perfect.
       for (var i = 0; i < audioState.length; i++){
         if (audioState[i]){
           //audioFiles[i].pause();
@@ -108,7 +108,7 @@ function App() {
         }
       }
     //}
-  }, [time]);
+  }, []);
   
 
   // TRY TO HAIL MIDI DEVICES -> CALLED WHEN connect midi BUTTON PRESSED
@@ -135,17 +135,22 @@ function App() {
     })
   }
 
+  // When any BT-related function fails, it should bail and direct the user to the ble-midi-bridge instructions
+  function onBTFailure() {
+    console.log("WebBluetooth not enabled or unsupported");
+    const btbutton = document.getElementsByName("BTbutton")[0];
+    btbutton.innerHTML = '<a target="_blank" href="./BTinstructions.html">Bluetooth instructions</a>';
+    btbutton.disabled = true;
+  }
+
   // web bluetooth setup handler, will pop up a device selector with only les paulverizers visible
   function webBTsetup() {
     const bt = navigator.bluetooth;
     if (bt === null || bt === undefined) {
-      console.log("WebBluetooth not enabled or unsupported");
-      document.getElementsByName("BTbutton")[0].innerHTML = '<a target="_blank" href="./BTinstructions.html">Bluetooth instructions</a>';
+      onBTFailure();
       return;
     }
-    document.getElementsByName("BTbutton")[0].disabled = false;
     setCurrentBT("Listing devices");
-	//TODO: add failure conditions to both of these .then()s
     bt.getAvailability().then((available) => {
       if (available) {
         console.log("This device supports Bluetooth!");
@@ -157,12 +162,11 @@ function App() {
           optionalServices: [MIDI_SERVICE_UUID],
           //acceptAllDevices: true, //would pop up a generic device chooser
         }
-        bt.requestDevice(options).then(connectBTDevice);
+        bt.requestDevice(options).then(connectBTDevice, onBTFailure);
       } else {
-        console.log("WebBluetooth not enabled or unsupported");
-        document.getElementsByName("BTbutton")[0].innerHTML = '<a target="_blank" href="./BTinstructions.html">Bluetooth instructions</a>';
+        onBTFailure();
       }
-    });
+    }, onBTFailure);
   }
 
   //Known issue: if user is pressing one of the buttons during the pairing process, the web button will be stuck in the opposite state (i.e. on unless physical button pressed)
@@ -212,8 +216,8 @@ function App() {
       let inTempo = velocity+100; //increase so it's more interesting
       setPlayTempo(inTempo);
       // console.log("inTempo: "+inTempo+", tempo: "+tempo);
-    } else if (command === 128 || command === 144) { // so it doesn't accidentally change a note value
-      if (velocity > 10) {
+    } else if (command >= 128 && command <= 145) { // so it doesn't accidentally change a note value.
+      if (velocity > 10) { //This isn't necessary bc the device always sends 127 for velo
           //setCurrentNote(note);
           switch (note) {
             case 63:
@@ -232,6 +236,8 @@ function App() {
       }
     }
     else {
+      console.log("Recieved an unhandled MIDI message");
+      console.log(message);
       //setCurrentNote(0);
     }
   }
