@@ -4,7 +4,7 @@ import Stack from 'react-bootstrap/Stack';
 
 // IMPORT BOTH THE LabRAT LOGO AND THE LES PAULVERIZER LOGO
 import LabRAT from './assets/images/Lab_RAT_Logo.png'
-import LesPaulverizerLogo from './assets/images/LesPaulverizerLogo.png'
+import LesPaulverizerLogo from './assets/images/lespaulverizerlogoblacktext.png'
 
 // LEXI'S MUSIC (DEFAULT MUSIC 1)
 import LexiBass from './assets/audio/Lexi-Bass-100bpm4-4_4m_P0b.wav'
@@ -23,6 +23,7 @@ import CaseyArpeggio from './assets/audio/Casey-Arpeggio-120bpm3-4_4m_P0b.wav'
 import CaseyBase from './assets/audio/Casey-Base-120bpm3-4_4m_P0b.wav'
 import CaseyHarmony from './assets/audio/Casey-Harmony-120bpm3-4_4m_P0b.wav'
 import CaseyPercussion from './assets/audio/Casey-Percussion-120bpm3-4_4m_P0b.wav'
+import { Navbar } from "react-bootstrap";
 
 // STORES THE DEFAULT VALUE WHICH THE METRONOME WILL DISPLAY WHEN IT IS OFF
 var defaultTimerVal = "--";
@@ -362,13 +363,23 @@ function App() {
   // VISIBLE/INTERACTIBLE ELEMENTS ON WEBSITE
   return(
     <>  
+      {/* THIS IS THE NAVBAR AT THE TOP THAT HOLDS THE LESPAULVERIZER LOGO */}
+      <Navbar className="Navbar">
+        <h2 className="logo">
+          <img src={LesPaulverizerLogo} className='lespaul' alt='lespaul'/>
+        </h2>
+      </Navbar>
+      <br>
+      </br>
+      <br>
+      </br>
+      <br>
+      </br>
+      <br>
+      </br>
       {/* THIS SECTION CONTAINS THE TWO COLUMNS OF THE WEBSITE (LEFT FOR TEMPO AND ADJUSTMENTS, RIGHT FOR AUDIO BUTTONS) */}
       <div className="row">
 
-        {/* THIS h2 IS FOR THE LES PAULVERIZER LOGO, USING className "img.lespaul" IN THE App.css */}
-        <h2>  
-          <img src={LesPaulverizerLogo} className='lespaul' alt='lespaul'/>
-        </h2>
         {/* ======================================================================================*/}
 
 
