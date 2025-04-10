@@ -1,10 +1,8 @@
 TODO:
 firmware:
-    change firmware to have buttons *toggle* the samples on the webapp over BT like on USB
-    implement firmware switch to toggle mode for both USB and BT based on one button being held on startup (when plugged in)
+    test USB
 
 webapp:
-    finalize BT instructions for Mac
     get updated UI from other team
     get samples that actually loop properly to determine if new looping code works
     make sure that it actually works with all methods of connection

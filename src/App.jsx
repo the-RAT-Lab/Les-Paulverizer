@@ -256,12 +256,13 @@ function App() {
 
       // SET THE BUTTON NAME TO "Play"
       customSetButtonName(index, 'Play');
-    
+      // console.log("turned audio #%d off", index);
     } else {
       // OTHERWISE, SET THE STATE TO TRUE BECAUSE WE ARE TURNING THIS AUDIO ON
       audioState[index] = true;
       // SET THE BUTTON NAME TO "Stop"
       customSetButtonName(index, 'Stop');
+      // console.log("turned audio #%d on", index);
     }
 
     // TEMPORARY VARIABLE TO TEST IF ALL AUDIO FILES ARE ON OR OFF
@@ -275,10 +276,13 @@ function App() {
     }
 
     // IF ALL AUDIO FILES ARE OFF, TURN THE METRONOME OFF
-    if (allOff) setMetroOn(false);
-
-    // ELSE IF THE METRONOME IS NOT ON, TURN IT ON
-    else if (!metroOn) setMetroOn(true);
+    if (allOff) {
+      setMetroOn(false);
+      // console.log("turned off metronome");
+    } else if (!metroOn) { // ELSE IF THE METRONOME IS NOT ON, TURN IT ON
+      setMetroOn(true);
+      // console.log("turned on metronome");
+    }
   }
 
 
