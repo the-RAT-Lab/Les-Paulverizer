@@ -1,0 +1,13 @@
+.toggle-container{
+    position: absolute;
+    top: 2em;
+    right: 2em;
+}
+
+.toggle {
+    visibility: hidden;
+}
+
+.toglge + label {
+    display: flex;
+}

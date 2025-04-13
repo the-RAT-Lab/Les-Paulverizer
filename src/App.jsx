@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import './App.css'
 import Stack from 'react-bootstrap/Stack';
+import { Toggle } from "./components/Toggle"
 
 // IMPORT BOTH THE LabRAT LOGO AND THE LES PAULVERIZER LOGO
 import LabRAT from './assets/images/Lab_RAT_Logo.png'
 import LesPaulverizerLogo from './assets/images/LesPaulverizerLogo.png'
+import LesPaulverizerLogoDark from './assets/images/lespaulverizerlogodark.png'
 
 // LEXI'S MUSIC (DEFAULT MUSIC 1)
 import LexiBass from './assets/audio/Lexi-Bass-100bpm4-4_4m_P0b.wav'
@@ -59,6 +61,17 @@ function App() {
   const [buttonName2, setButtonName2] = useState("Play");
   const [buttonName3, setButtonName3] = useState("Play");
 
+  const [isDark, setIsDark] = useState(false);
+
+  const lespaul = ({ isDark }) => {
+    if(!isDark){
+      lespaul = LesPaulverizerLogoDark;
+    } 
+    else{
+      lespaul = LesPaulverizerLogo;
+    }}
+
+
   // TIMER HANDLER--> LISTENS FOR ANY UPDATE TO metroOn TO START OR RESET THE METRONOME
   React.useEffect(() => {
     // DECLARE A LOCAL VARIABLE CALLED INTERVAL
@@ -108,6 +121,7 @@ function App() {
     }
   }, [time]);
   
+
 
   // TRY TO HAIL MIDI DEVICES -> CALLED WHEN connect midi BUTTON PRESSED
   function midiStartup() {
@@ -361,13 +375,19 @@ function App() {
 
   // VISIBLE/INTERACTIBLE ELEMENTS ON WEBSITE
   return(
-    <>  
+    <div className="App" data-theme={isDark ? "dark" : "light"} logoColor>  
+
+      {/* THIS SECTION TOGGLES DARK/LIGHT MODE */}
+      <Toggle isChecked={isDark} handleChange={() => setIsDark(!isDark)} />
+
+
       {/* THIS SECTION CONTAINS THE TWO COLUMNS OF THE WEBSITE (LEFT FOR TEMPO AND ADJUSTMENTS, RIGHT FOR AUDIO BUTTONS) */}
       <div className="row">
 
         {/* THIS h2 IS FOR THE LES PAULVERIZER LOGO, USING className "img.lespaul" IN THE App.css */}
         <h2>  
-          <img src={LesPaulverizerLogo} className='lespaul' alt='lespaul'/>
+          
+          <img src={isDark ? LesPaulverizerLogo : LesPaulverizerLogoDark} className='lespaul' alt='lespaul'/>
         </h2>
         {/* ======================================================================================*/}
 
@@ -486,7 +506,7 @@ function App() {
       </div>
       {/* END RATLAB LOGO ===================== */}
 
-    </>
+    </div>
 
   );
 }
