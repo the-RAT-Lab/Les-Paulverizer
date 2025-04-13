@@ -2,6 +2,8 @@
 
 Demo: https://www.youtube.com/watch?v=ic7TwA5fXPE 
 
+Working Branch
+
 The Les Paulverizer is a small MIDI device that allows a user to play looping background tracks while the user can continue to play a melody on their instrument. In previous iterations of this project, this functionality was provided through a Max 8 patch, which worked but was not accessible to those who did not own the software. During A term 2024, we were tasked with emulating the functions of the Max patch within a web platform. We used ReactJS to build the website and GitHub for source control.
 
 Read the full paper [here](https://docs.google.com/document/d/13cVpmoDDjN0WZTLEGfrQCCLLRbOX5a5XA4xZZNLbrsc/edit?usp=sharing).
