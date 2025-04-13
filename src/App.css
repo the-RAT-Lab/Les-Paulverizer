@@ -24,6 +24,7 @@ body {
   background-color: #f3e1fc;
   box-sizing: border-box;
   width: 100%;
+  position: fixed;
 }
 
 .logo {

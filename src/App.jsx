@@ -425,12 +425,10 @@ function App() {
           </button>
           <button className="header-button" onClick={midiStartup}>
             {currentNote === 'Connect to MIDI' ? 'Connect to MIDI' : 
-             currentNote === 'Hailing...' ? 'Hailing...' :
-             currentNote === 'Connected' ? 'Connected' : 'Connection Failed'}
+            currentNote === 'Hailing...' ? 'Hailing...' :
+            currentNote === 'Connected' ? 'Connected' : 'Connection Failed'}
           </button>
         </div>
-        
-        <button className="menu-button">≡</button>
       </div>
       
       <div className="main-content">
