@@ -14,11 +14,17 @@
 
   --background-color: rgba(255, 255, 255, 0.87):
   --text-color: black;
+  --navbar-color: #e799f1;
+  --headerbutton-color: #6a5acd;
+  --headerbuttonhover-color: #5a4abf; 
 }
 
 [data-theme="dark"]{
   --background-color: #242424;
   --text-color: white;
+  --navbar-color: #7669ce;
+  --headerbutton-color: #4c36d6;
+  --headerbuttonhover-color: #381fdc; 
 }
 
 a {
