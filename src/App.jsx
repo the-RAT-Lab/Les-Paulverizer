@@ -97,7 +97,8 @@ function App() {
 
   // SOUND HANDLER --> LISTENS FOR ANY CHANGE TO THE time VARIBALE (THE METRONOME) 
   //                        IF THE TIME IS 1, THEN IT WILL RESTART ALL AUDIO FILES CURRENTLY ACTIVE (LOOPING!)
-  React.useEffect(() => {
+  // TODO: maybe revert all this!
+  /* React.useEffect(() => {
     //if (time == 1) { //It seems disabling this makes looping sound better. Not perfect.
       for (var i = 0; i < audioState.length; i++){
         if (audioState[i]){
@@ -105,10 +106,12 @@ function App() {
           //audioFiles[i].currentTime = 0;
           audioFiles[i].play();
           audioFiles[i].loop = true;
+		  audioFiles[i].muted = false;
+		  audioFiles[i].volume = 1.0;
         }
       }
     //}
-  }, []);
+  }, []); */
   
 
   // TRY TO HAIL MIDI DEVICES -> CALLED WHEN connect midi BUTTON PRESSED
@@ -260,6 +263,8 @@ function App() {
     } else {
       // OTHERWISE, SET THE STATE TO TRUE BECAUSE WE ARE TURNING THIS AUDIO ON
       audioState[index] = true;
+	  audioFiles[index].play();
+	  audioFiles[index].loop = true;
       // SET THE BUTTON NAME TO "Stop"
       customSetButtonName(index, 'Stop');
       // console.log("turned audio #%d on", index);
@@ -416,12 +421,14 @@ function App() {
   }
 
   // STOPS AUDIO AND SETS THE TOP VALUE IN THE TIME SIGNATURE (BEATS PER MEASURE)
+  // Currently has no effect on the audio playback
   function customSetTimeSignature(input) {
     stopAudio();
     setTimeSignature([input,4]);
   }
 
   // STOPS AUDIO AND SETS NUMBER OF MEASURES
+  // Currently has no effect on the audio playback
   function customSetNumMeasures(input) {
     stopAudio();
     setNumMeasures(input)
