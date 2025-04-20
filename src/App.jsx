@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import './App.css'
 
 // IMPORT BOTH THE LabRAT LOGO AND THE LES PAULVERIZER LOGO
@@ -25,26 +25,36 @@ import CaseyHarmony from './assets/audio/Casey-Harmony-120bpm3-4_4m_P0b.wav'
 import CaseyPercussion from './assets/audio/Casey-Percussion-120bpm3-4_4m_P0b.wav'
 
 // STORES THE DEFAULT VALUE WHICH THE METRONOME WILL DISPLAY WHEN IT IS OFF
-var defaultTimerVal = "--";
+let defaultTimerVal = "--";
 
 // STORES ALL AUDIO FILES AS A BACKUP
-var customGroup = [LexiBass, LexiMarimba, LexiMidnightSillage, LexiPiano];
-var group1 = [LexiBass, LexiMarimba, LexiMidnightSillage, LexiPiano];
-var group2 = [TristinDrums, TristinPiano, TristinBass, TristinSynths];
-var group3 = [CaseyArpeggio, CaseyBase, CaseyHarmony, CaseyPercussion];
+let customGroup = [LexiBass, LexiMarimba, LexiMidnightSillage, LexiPiano];
+let group1 = [LexiBass, LexiMarimba, LexiMidnightSillage, LexiPiano];
+let group2 = [TristinDrums, TristinPiano, TristinBass, TristinSynths];
+let group3 = [CaseyArpeggio, CaseyBase, CaseyHarmony, CaseyPercussion];
 
 // STORES A REFERENCE TO EACH CURRENT AUDIO FILE
-var audioFiles = [new Audio(group1[0]), new Audio(group1[1]), new Audio(group1[2]), new Audio(group1[3])];
+let audioFiles = [new Audio(group1[0]), new Audio(group1[1]), new Audio(group1[2]), new Audio(group1[3])];
 
 // A LIST OF VARIABLES TO STORE WHETHER A PARTICULAR AUDIO FILE IS PLAYING OR NOT
-var audioState = [false, false, false, false];
+let audioState = [false, false, false, false];
+
+// MIDI tempo values to smooth out the tempo readings from the hardware device
+let tempoBuffer = [0, 0, 0, 0];
+let tempoBufferIndex = 0;
+
+// The constant values that the BT code searches for to connect to the right device
+const MIDI_SERVICE_UUID = '03b80e5a-ede8-4b33-a751-6ce34ec4c700';
+const MIDI_IO_CHARACTERISTIC_UUID = '7772e5db-3868-4112-a1a9-f2669d106bf3';
 
 function App() {
   // STATE VARIABLES FOR THE TIME (WHAT THE METRONOME SAYS), THE METRONOME STATUS, AND WHAT MIDI NOTE IS BEING PLAYED
   const [time, setTime] = useState(defaultTimerVal);
   const [metroOn, setMetroOn] = useState(false);
+  
+  // State vars for buttons and MIDI-related things
   const [currentNote, setCurrentNote] = useState('Connect to MIDI');
-
+  const [currentBT, setCurrentBT] = useState('Connect to Bluetooth');
 
   // STATE THAT DECIDES IF WE ARE IN DARK OR LIGHT MODE
   const [isDark, setIsDark] = useState(false);
@@ -60,13 +70,12 @@ function App() {
   // TIMER HANDLER--> LISTENS FOR ANY UPDATE TO metroOn TO START OR RESET THE METRONOME
   React.useEffect(() => {
     let interval = null;
-
+	
     if (metroOn) {
-      setTime(1);
-      
+	  setTime(1);
       interval = setInterval(() => {
         setTime((time) => metronome(time));
-      }, 60000/parseInt(tempo, 10));
+      }, 60000/(parseInt(tempo) || 100));
     }
     else {
       clearInterval(interval);
@@ -81,7 +90,7 @@ function App() {
   // SOUND HANDLER --> LISTENS FOR ANY CHANGE TO THE time VARIABLE
   React.useEffect(() => {
     if (time == 1) {
-      for (var i = 0; i < audioState.length; i++){
+      for (let i = 0; i < audioState.length; i++){
         if (audioState[i]){
           audioFiles[i].pause();
           audioFiles[i].currentTime = 0;
@@ -111,37 +120,134 @@ function App() {
   // NO MIDI DEVICES FOUND HANDLER
   function onMidiFailure() {
     setCurrentNote('Connection Failed');
+	document.getElementsByName("MIDIbutton")[0].disabled = false;
   }
 
   // MIDI DEVICE FOUND HANDLER / ASSIGNS getMidiMessage AS MIDI INPUT HANDLER
   function onMidiSuccess(midiAccess) {
     setCurrentNote('Connected');
+	document.getElementsByName("MIDIbutton")[0].disabled = true;
     midiAccess.inputs.forEach((input) => {
       input.onmidimessage = getMidiMessage;
     })
   }
+  
+  // When any BT-related function fails, it should bail and direct the user to the ble-midi-bridge instructions
+  function onBTFailure() {
+    console.log("WebBluetooth not enabled or unsupported");
+    const btbutton = document.getElementsByName("BTbutton")[0];
+    btbutton.innerHTML = '<a target="_blank" href="./BTinstructions.html">Bluetooth instructions</a>';
+    btbutton.disabled = true;
+  }
+
+  // web bluetooth setup handler, will pop up a device selector with only les paulverizers visible
+  function webBTsetup() {
+    const bt = navigator.bluetooth;
+    if (bt === null || bt === undefined) {
+      onBTFailure();
+      return;
+    }
+    setCurrentBT("Listing devices");
+    bt.getAvailability().then((available) => {
+      if (available) {
+        console.log("This device supports Bluetooth!");
+        let options = {
+          filters: [
+            {services: [MIDI_SERVICE_UUID]}, //ensures that only our device shows up in the chooser
+            {name: "Les Paulverizer"},
+          ],
+          optionalServices: [MIDI_SERVICE_UUID],
+          //acceptAllDevices: true, //would pop up a generic device chooser
+        }
+        bt.requestDevice(options).then(connectBTDevice, onBTFailure);
+      } else {
+        onBTFailure();
+      }
+    }, onBTFailure);
+  }
+
+  //Known issue: if user is pressing one of the buttons during the pairing process, the web button will be stuck in the opposite state (i.e. on unless physical button pressed)
+  // alleviated by just clicking the on-screen button to toggle it off
+  async function connectBTDevice(device) {
+    console.log(device);
+    const server = await device.gatt.connect();
+    console.log("connected to server: "+server.connected);
+    setCurrentBT("Connecting");
+    const service = await server.getPrimaryService(MIDI_SERVICE_UUID);
+    console.log("got service");
+    const characteristic = await service.getCharacteristic(MIDI_IO_CHARACTERISTIC_UUID);
+    characteristic.addEventListener('characteristicvaluechanged', (e)=>{
+      const packet = new Uint8Array(e.target.value.buffer)
+      // console.log("BT char updated: "+packet);
+      getMidiMessage({data: [packet[2], packet[3], packet[4]]});
+    });
+    await characteristic.startNotifications();
+    setCurrentBT("Connected");
+    setCurrentNote("Connected");
+    document.getElementsByName("BTbutton")[0].disabled = true; //to prevent people from messing things up after it's already working
+    document.getElementsByName("MIDIbutton")[0].disabled = true; // logic being that if they want to change config, they should refresh
+  }
 
   // MIDI INPUT HANDLER -> CALLS handleClick() FOR EACH POSSIBLE BUTTON (NOTE 39,41,43,45)
   function getMidiMessage(message) {
-    var command = message.data[0];
-    var note = message.data[1];
-    var velocity = message.data[2];
-    if (velocity > 10) {
-        switch (note) {
-          case 63:
-            handleClick(0);
-            break;
-          case 65:
-            handleClick(1);
-            break;
-          case 67:
-            handleClick(2);
-            break;
-          case 69:
-            handleClick(3);
-            break;
+    let command = message.data[0];
+    let note = message.data[1];
+    let velocity = message.data[2];
+    if (command === 182) {
+      //set tempo to value of velocity
+      let inTempo = velocity+100; //increase so it's more interesting
+	  addTempoToBuffer(inTempo);
+    } else if (command >= 128 && command <= 145) { // so it doesn't accidentally change a note value.
+      if (velocity > 10) {
+          switch (note) {
+            case 63:
+              handleClick(0);
+              break;
+            case 65:
+              handleClick(1);
+              break;
+            case 67:
+              handleClick(2);
+              break;
+            case 69:
+              handleClick(3);
+              break;
+        }
       }
     }
+    else {
+      console.log("Recieved an unhandled MIDI message");
+      console.log(message);
+    }
+  }
+  
+  // The next three functions all deal with a circular buffer of tempo inputs from the hardware Les Paulverizer.
+  // Because the potentiometer on the device doesn't have infinite precision, there are positions where it constantly fluctuates between two values
+  // This is bad for us because that constantly resets the metronome and the audio files, which can be very annoying.
+  // What these functions do is average the last 4 tempo inputs and only update the tempo then.
+  // Known issues: the range is always 100 to 227, so setting the tempo lower and then adjusting the potentiometer will set it to > 100
+  //				the range isn't perfect, it often mins at about 104 or so.
+  function getTBIndex() {
+	  tempoBufferIndex++;
+	  if (tempoBufferIndex >= tempoBuffer.length) {
+		  tempoBufferIndex = 0;
+		  setTempoFromBuffer();
+	  }
+	  return tempoBufferIndex;
+  }
+  
+  function addTempoToBuffer(inTempo) {
+	  tempoBuffer[getTBIndex()] = inTempo;
+  }
+  
+  function setTempoFromBuffer() {
+	  let avgTempo = 0;
+	  for (let i = 0; i < tempoBuffer.length; i++) {
+		  avgTempo += tempoBuffer[i];
+	  }
+	  if (avgTempo != 0) {
+		setTempo(parseInt(avgTempo/4));
+	  }
   }
 
   // TOGGLES STATE FOR EACH SOUND AND STARTS TIMER IF ANY SOUND IS ON
@@ -161,10 +267,10 @@ function App() {
     }
 
     // TEMPORARY VARIABLE TO TEST IF ALL AUDIO FILES ARE ON OR OFF
-    var allOff = true;
+    let allOff = true;
 
     // THIS FOR-LOOP IS TRUE IF ALL AUDIO FILES ARE OFF, FALSE OTHERWISE
-    for (var i = 0; i < audioState.length; i++){
+    for (let i = 0; i < audioState.length; i++){
       if (audioState[i]){
         allOff = false;
       }
@@ -185,7 +291,7 @@ function App() {
     // IF METRONOME IS ON
     if (metroOn) {
       // INCREASE METRONOME BY 1, TO A MAXIMUM OF (BEATS PER MEASURE * NUMBER OF MEASURES)
-      var out = (parseInt(timein) % (timeSignature[0] * numMeasures)) + 1;
+      let out = (parseInt(timein) % (timeSignature[0] * numMeasures)) + 1;
       // RETURN THAT VALUE
       return out;
     }
@@ -202,7 +308,7 @@ function App() {
     switch (index) {
       case 0:
         // LOOP THROUGH OUR CURRENT AUDIO FILES
-        for (var i = 0; i < audioFiles.length; i++) {
+        for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF THE USER'S UPLOADED FILES
           audioFiles[i] = new Audio(customGroup[i]);
         }
@@ -210,7 +316,7 @@ function App() {
 
       case 1:
         // LOOP THROUGH OUR CURRENT AUDIO FILES
-        for (var i = 0; i < audioFiles.length; i++) {
+        for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group1's FILES
           audioFiles[i] = new Audio(group1[i]);
         }
@@ -218,7 +324,7 @@ function App() {
 
       case 2:
         // LOOP THROUGH OUR CURRENT AUDIO FILES
-        for (var i = 0; i < audioFiles.length; i++) {
+        for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group2's FILES
           audioFiles[i] = new Audio(group2[i]);
         }
@@ -226,7 +332,7 @@ function App() {
 
       case 3:
         // LOOP THROUGH OUR CURRENT AUDIO FILES
-        for (var i = 0; i < audioFiles.length; i++) {
+        for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group3's FILES
           audioFiles[i] = new Audio(group3[i]);
         }
@@ -240,10 +346,11 @@ function App() {
   // THIS FUNCTION LOOPS THROUGH ALL AUDIO FILES, STOPS THEM, AND SET THE BUTTON NAMES
   function stopAudio() {
     // FIRST, SET METRONOME TO FALSE
+	console.log("stopAudio turning metro off");
     setMetroOn(false);
 
     // LOOP THROUGH ALL AUDIO FILES AND STOP THEM
-    for (var i = 0; i < audioFiles.length; i++) {
+    for (let i = 0; i < audioFiles.length; i++) {
       // STOP ALL AUDIO AND RESET THEM
       audioFiles[i].pause();
       audioFiles[i].currentTime = 0;
@@ -280,7 +387,7 @@ function App() {
 
   // STOPS AUDIO AND SETS TEMPO
   function customSetTempo(input) {
-    const newTempo = Math.max(1, Math.min(200, parseInt(input) || 100));
+    const newTempo = Math.max(1, Math.min(230, parseInt(input) || 100));
     stopAudio();
     setTempo(newTempo);
   }
@@ -327,7 +434,7 @@ function App() {
           <input
             type="range"
             min="1"
-            max="200"
+            max="230"
             value={tempo}
             className="tempo-slider"
             onChange={(e) => customSetTempo(e.target.value)}
@@ -343,7 +450,7 @@ function App() {
               value={tempo}
               onChange={(e) => customSetTempo(e.target.value)}
               min="1" 
-              max="200"
+              max="230"
             />
             <span>bpm</span>
           </div>
@@ -443,10 +550,11 @@ function App() {
           <button className="header-button" onClick={togglePage}>
             {activePage === 'main' ? 'Customize' : 'Back'}
           </button>
-          <button className="header-button" onClick={midiStartup}>
-            {currentNote === 'Connect to MIDI' ? 'Connect to MIDI' : 
-            currentNote === 'Hailing...' ? 'Hailing...' :
-            currentNote === 'Connected' ? 'Connected' : 'Connection Failed'}
+          <button className="header-button" name="MIDIbutton" onClick={midiStartup}>
+            {currentNote}
+          </button>
+		  <button className="header-button" name="BTbutton" onClick={webBTsetup}>
+            {currentBT}
           </button>
 
           {/* HEADER BUTTON THAT SWITCHES BETWEEN LIGHT AND DARK MODE */}
