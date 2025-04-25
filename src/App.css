@@ -174,7 +174,7 @@ body {
 /* Controls section */
 .controls {
   margin: 2rem 0;
-  display: flex;
+  display: inline-table;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
@@ -186,6 +186,7 @@ body {
   align-items: center;
   gap: 1rem;
   margin: 0.5rem 0;
+  
 }
 
 .control-label {
@@ -208,7 +209,6 @@ body {
   border-radius: 0.5rem;
   border: 1px solid #ccc;
   font-size: 1rem;
-  background-color: #242424;
 }
 
 /* Button styles */
