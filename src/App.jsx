@@ -7,31 +7,31 @@ import LesPaulverizerLogo from './assets/images/LesPaulverizerLogo.png'
 import LesPaulverizerLogoDark from './assets/images/LesPaulverizerLogo_light.png'
 
 // LEXI'S MUSIC (DEFAULT MUSIC 1)
-import LexiBass from './assets/audio/Lexi-Bass-100bpm4-4_4m_P0b.wav'
-import LexiMarimba from './assets/audio/Lexi-Marimba-100bpm4-4_4m_P0b.wav'
-import LexiMidnightSillage from './assets/audio/Lexi-MidnightSillage-100bpm4-4_4m_P0b.wav'
-import LexiPiano from './assets/audio/Lexi-Piano-100bpm4-4_4m_P0b.wav'
+import DrumLoop1 from './assets/audio/Drum Loop 1 120 4_4.wav'
+import DrumLoop2 from './assets/audio/Drum Loop 2 120 4_4.wav'
+import DrumLoop3 from './assets/audio/Drum Loop 3 120 4_4.wav'
+import DrumLoop4 from './assets/audio/Drum Loop 4 120 4_4.wav'
 
 // TRISTIN'S MUSIC (DEFAULT MUSIC 2)
-import TristinDrums from './assets/audio/tristin_drums.wav'
-import TristinPiano from './assets/audio/tristin_piano.wav'
-import TristinBass from './assets/audio/tristin_bass.wav'
-import TristinSynths from './assets/audio/tristin_synths.wav'
+import Drumz1 from './assets/audio/Drumz1.wav'
+import Drumz2 from './assets/audio/Drumz2.wav'
+import Drumz3 from './assets/audio/Drumz3.wav'
+import Drumz4 from './assets/audio/Drumz4.wav'
 
 // CASEY'S MUSIC (DEFAULT MUSIC 1)
-import CaseyArpeggio from './assets/audio/Casey-Arpeggio-120bpm3-4_4m_P0b.wav'
-import CaseyBase from './assets/audio/Casey-Base-120bpm3-4_4m_P0b.wav'
-import CaseyHarmony from './assets/audio/Casey-Harmony-120bpm3-4_4m_P0b.wav'
-import CaseyPercussion from './assets/audio/Casey-Percussion-120bpm3-4_4m_P0b.wav'
+import Synth1 from './assets/audio/Synth 1.wav'
+import Synth2 from './assets/audio/Synth 2.wav'
+import Synth3 from './assets/audio/Synth 3.wav'
+import Synth4 from './assets/audio/Synth 4.wav'
 
 // STORES THE DEFAULT VALUE WHICH THE METRONOME WILL DISPLAY WHEN IT IS OFF
 let defaultTimerVal = "--";
 
 // STORES ALL AUDIO FILES AS A BACKUP
-let customGroup = [LexiBass, LexiMarimba, LexiMidnightSillage, LexiPiano];
-let group1 = [LexiBass, LexiMarimba, LexiMidnightSillage, LexiPiano];
-let group2 = [TristinDrums, TristinPiano, TristinBass, TristinSynths];
-let group3 = [CaseyArpeggio, CaseyBase, CaseyHarmony, CaseyPercussion];
+let customGroup = [DrumLoop1, DrumLoop2, DrumLoop3, DrumLoop4];
+let group1 = [DrumLoop1, DrumLoop2, DrumLoop3, DrumLoop4];
+let group2 = [Drumz1, Drumz2, Drumz3, Drumz4];
+let group3 = [Synth1, Synth2, Synth3, Synth4];
 
 // STORES A REFERENCE TO EACH CURRENT AUDIO FILE
 let audioFiles = [new Audio(group1[0]), new Audio(group1[1]), new Audio(group1[2]), new Audio(group1[3])];
