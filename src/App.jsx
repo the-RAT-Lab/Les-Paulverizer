@@ -136,7 +136,7 @@ function App() {
   function onBTFailure() {
     console.log("WebBluetooth not enabled or unsupported");
     const btbutton = document.getElementsByName("BTbutton")[0];
-    btbutton.innerHTML = '<a target="_blank" href="./BTinstructions.html">Bluetooth instructions</a>';
+    btbutton.innerHTML = '<a target="_blank" href="./BTInstructions/">Bluetooth instructions</a>';
     btbutton.disabled = true;
   }
 
