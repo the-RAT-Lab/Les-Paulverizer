@@ -1,99 +1,334 @@
+/* Main container styles */
 #root {
+  margin: 0;
+  text-align: center;
+  background-color: var(--background-color);
+  min-height: 100vh;
+  width: 100%; /* Changed from min-width: 100vw */
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+.App{
   margin: 0 auto;
   text-align: center; 
-  background-color: #242424;
+  background-color: var(--background-color);
   background-size: 100% 100%;
-  min-height: 100vh;
-  min-width: 100vw;  
 }
 
-.row{
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Header styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem;
+  background-color: var(--navbar-color);
+  box-sizing: border-box;
+  width: 100%;
+  /* position: fixed; */
 }
 
-.row:after{
-  content: "";
-  display: table;
-  clear: both;
-  margin: 1rem
+.logo {
+  height: 3.5rem;
+  margin-left: 1rem;
 }
 
-.column {
-  float: left;
-  width: 50%;
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
 }
 
-h2{
-  font-family: Arial, Helvetica, sans-serif;
+.header-button {
+  background-color: var(--headerbutton-color);
   color: white;
-  font-size: xx-large;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-h2.metronome{
-  font-size: 27px;
+.header-button:hover {
+  background-color: var(--headerbuttonhover-color);
 }
 
-h2.inputfield{
-  font-size: 15px;
-  font-size: large;
+.menu-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Main content container */
+.main-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Metronome display */
+.metronome-display {
+  margin: 1rem auto 2rem;
+  text-align: center;
+}
+
+.metronome-count {
+  font-size: 3rem;
   font-weight: bold;
+  color: #6a5acd;
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  display: inline-block;
+  min-width: 100px;
 }
 
-button{
-  color: white;
-  margin: 0.5rem;
+/* Pad container styles */
+.pad-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 3rem 0;
 }
 
-button.button0{
-  font-size: 15px;
-  background-color: #705cd3;
+.pad {
+  width: 150px;
+  height: 150px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s;
 }
 
-button.button1{
-  font-size: 15px;
+.pad:hover {
+  transform: scale(1.05);
+}
+
+.pad:active {
+  transform: scale(0.98);
+}
+
+.pad-0 {
+  background-color: #6a5acd;
+}
+
+.pad-1 {
   background-color: #b561f3;
 }
-button.button2{
-  font-size: 15px;
+
+.pad-2 {
   background-color: #d8b1fc;
 }
 
-button.button3{
-  font-size: 15px;
+.pad-3 {
   background-color: #f7c5de;
 }
 
-.select-music{
-  font-size: 15px;
-  border-color: lightgray;
-  background-color: rgb(60, 60, 60);
-  color:white;
+/* Tempo slider styles */
+.tempo-slider-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 10px 0;
 }
 
+.tempo-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #ccc;
+  outline: none;
+  border-radius: 2px;
+}
 
-input.textinput{
+.tempo-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #6a5acd;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.tempo-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #6a5acd;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Controls section */
+.controls {
+  margin: 2rem 0;
+  display: inline-table;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color : var(--text-color);
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  
+}
+
+.control-label {
+  font-size: 1.1rem;
+  min-width: 160px;
+  text-align: right;
+}
+
+.control-input {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
   text-align: center;
-  border-radius: 6px;
-  border-color: white;
-  border-width: 2px;
-
-  background-color: #242424;
-  color: white;
+  width: 120px;
 }
 
-input.upload{
-  color-scheme: gray;
-  padding-left: 1em;
-  color: lightgray;
+.control-dropdown {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
 }
 
-img.lespaul{
-  height: 2em;
-  padding-top: 1em;
-  margin-bottom: -1em;
+/* Button styles */
+.action-button {
+  background-color: transparent;
+  color: #6a5acd;
+  border: 1px solid #6a5acd;
+  border-radius: 2rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin: 0.5rem;
 }
 
-img.logo{
-  padding-top: 2rem;
-  height: 3.5em;
- }
+.action-button:hover {
+  background-color: #6a5acd20;
+}
+
+/* File upload styles */
+.upload-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.upload-button input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  outline: none;
+  background: white;
+  cursor: inherit;
+  display: block;
+}
+
+/* Customize page styles */
+.customize-container {
+  margin: 2rem auto;
+  color : var(--text-color);
+
+}
+
+.upload-section {
+  margin: 2rem 0;
+  color : var(--text-color);
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  justify-content: center;
+}
+
+.upload-preview {
+  border-radius: 4px;
+}
+
+.preset-section {
+  margin: 2rem 0;
+}
+
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.action-buttons {
+  margin: 2rem 0;
+}
+
+/* Footer styles */
+.footer {
+  margin-top: 4rem;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.footer-logo {
+  height: 4rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .pad-container {
+    flex-wrap: wrap;
+  }
+  
+  .pad {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .tempo-slider-container {
+    width: 90%;
+  }
+  
+  .control-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .control-label {
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .upload-row {
+    flex-direction: column;
+  }
+}
