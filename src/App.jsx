@@ -39,6 +39,9 @@ let audioFiles = [new Audio(group1[0]), new Audio(group1[1]), new Audio(group1[2
 // A LIST OF VARIABLES TO STORE WHETHER A PARTICULAR AUDIO FILE IS PLAYING OR NOT
 let audioState = [false, false, false, false];
 
+// AUDIO PLAYBACK RATE - 1.0 = normal speed
+let currentPlaybackRate = 1.0;
+
 // MIDI tempo values to smooth out the tempo readings from the hardware device
 let tempoBuffer = [0, 0, 0, 0];
 let tempoBufferIndex = 0;
@@ -66,6 +69,7 @@ function App() {
   const [tempo, setTempo] = useState(100);
   const [timeSignature, setTimeSignature] = useState([4,4]);
   const [numMeasures, setNumMeasures] = useState(4);
+  const [playbackRate, setPlaybackRate] = useState(1.0);
 
   // TIMER HANDLER--> LISTENS FOR ANY UPDATE TO metroOn TO START OR RESET THE METRONOME
   React.useEffect(() => {
@@ -94,6 +98,7 @@ function App() {
         if (audioState[i]){
           audioFiles[i].pause();
           audioFiles[i].currentTime = 0;
+          audioFiles[i].playbackRate = currentPlaybackRate;
           audioFiles[i].play();
         }
       }
@@ -107,6 +112,18 @@ function App() {
       setIsDark(false);
     } else {
       setIsDark(true);
+    }
+  }
+
+  // FUNCTION TO UPDATE PLAYBACK RATE FOR ALL AUDIO FILES
+  function updatePlaybackRate(newRate) {
+    currentPlaybackRate = newRate;
+    setPlaybackRate(newRate);
+    // Update playback rate for all currently playing audio files
+    for (let i = 0; i < audioFiles.length; i++) {
+      if (audioFiles[i]) {
+        audioFiles[i].playbackRate = currentPlaybackRate;
+      }
     }
   }
 
@@ -311,6 +328,7 @@ function App() {
         for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF THE USER'S UPLOADED FILES
           audioFiles[i] = new Audio(customGroup[i]);
+          audioFiles[i].playbackRate = currentPlaybackRate;
         }
       break;
 
@@ -319,6 +337,7 @@ function App() {
         for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group1's FILES
           audioFiles[i] = new Audio(group1[i]);
+          audioFiles[i].playbackRate = currentPlaybackRate;
         }
         break;
 
@@ -327,6 +346,7 @@ function App() {
         for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group2's FILES
           audioFiles[i] = new Audio(group2[i]);
+          audioFiles[i].playbackRate = currentPlaybackRate;
         }
         break;
 
@@ -335,6 +355,7 @@ function App() {
         for (let i = 0; i < audioFiles.length; i++) {
           // CREATE NEW AUDIO OBJECTS BASED OFF OF group3's FILES
           audioFiles[i] = new Audio(group3[i]);
+          audioFiles[i].playbackRate = currentPlaybackRate;
         }
         break;
 
@@ -441,6 +462,19 @@ function App() {
           />
         </div>
 
+        {/* Speed control slider */}
+        <div className="speed-slider-container">
+          <input
+            type="range"
+            min="0.5"
+            max="2.0"
+            step="0.1"
+            value={playbackRate}
+            className="speed-slider"
+            onChange={(e) => updatePlaybackRate(parseFloat(e.target.value))}
+          />
+        </div>
+
         <div className="controls">
           <div className="control-row">
             <span className="control-label">Tempo:</span>
@@ -486,6 +520,20 @@ function App() {
               <option value="8">8</option>
               <option value="16">16</option>
             </select>
+          </div>
+
+          <div className="control-row">
+            <span className="control-label">Playback Speed:</span>
+            <input 
+              type="number" 
+              className="control-input"
+              value={playbackRate}
+              onChange={(e) => updatePlaybackRate(parseFloat(e.target.value) || 1.0)}
+              min="0.5" 
+              max="2.0"
+              step="0.1"
+            />
+            <span>x</span>
           </div>
         </div>
 

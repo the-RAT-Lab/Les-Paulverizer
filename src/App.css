@@ -171,6 +171,43 @@ body {
   border: none;
 }
 
+/* Speed slider styles */
+.speed-slider-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 10px 0;
+}
+
+.speed-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #ffb347;
+  outline: none;
+  border-radius: 2px;
+}
+
+.speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #ff8c00;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.speed-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #ff8c00;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
 /* Controls section */
 .controls {
   margin: 2rem 0;
@@ -331,4 +368,90 @@ body {
   .upload-row {
     flex-direction: column;
   }
+}
+
+/* DAW Mode Specific Styles */
+.page-title {
+  flex: 1;
+  text-align: center;
+}
+
+.page-title h2 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.2rem;
+}
+
+.header-button.connected {
+  background-color: #27ae60;
+}
+
+.header-button.connected:hover {
+  background-color: #229954;
+}
+
+/* Classic and Customize Interface Styles */
+.classic-interface,
+.customize-interface {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  color: var(--text-color);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.setting-group label {
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.setting-group input,
+.setting-group select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.preset-section {
+  margin: 2rem 0;
+}
+
+.preset-section h4 {
+  color: var(--text-color);
+  margin-bottom: 1rem;
+}
+
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.preset-buttons button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--headerbutton-color);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.preset-buttons button:hover {
+  background-color: var(--headerbuttonhover-color);
 }

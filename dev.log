@@ -1,0 +1,12 @@
+
+> les-paulverizer-app@1.2.5 dev
+> vite
+
+Port 5173 is in use, trying another one...
+Port 5174 is in use, trying another one...
+
+  VITE v6.3.5  ready in 705 ms
+
+  ➜  Local:   http://localhost:5175/
+  ➜  Network: use --host to expose
+1:45:23 PM [vite] (client) page reload src/main.jsx

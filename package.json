@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:host": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npm run dev",
+    "clean": "rm -rf node_modules package-lock.json && npm install",
+    "clean:win": "rmdir /s /q node_modules && del package-lock.json && npm install"
   },
   "dependencies": {
     "@midival/core": "^0.1.7",
