@@ -569,7 +569,12 @@ function App() {
       </div>
       
       <div className="footer">
-        <img src={LabRAT} className="footer-logo" alt="LabRAT Logo" />
+        <div className="footer-text">
+          Get your own Les Paulverizer <a href="http://lespaulverizer.com" target="_blank" rel="noreferrer"> here</a>
+        </div>
+        <a href="http://theratlab.org" target="_blank" rel="noreferrer">
+          <img src={LabRAT} className="footer-logo" alt="LabRAT Logo" />
+        </a>
       </div>
     </div>
   );
