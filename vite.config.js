@@ -6,8 +6,8 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // Base path must match GitHub Pages repo name so built asset URLs resolve there.
-  base: '/Les-Paulverizer-website/',
+  // Base '/' works for custom domains or root-level GitHub Pages.
+  base: '/',
   build: {
     rollupOptions: {
       input: {
